@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Der Einzige Wahre Plan</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --card: #18181f;
+    --border: #2a2a35;
+    --accent: #e63946;
+    --accent2: #ff6b35;
+    --gold: #f4c430;
+    --text: #f0f0f5;
+    --muted: #7a7a90;
+    --green: #2ec27e;
+    --blue: #4a9eff;
+    --teal: #14b8a6;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  .app-header {
+    background: linear-gradient(135deg, #0a0a0f 0%, #1a0a10 100%);
+    padding: 20px 16px 16px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .app-title { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 2px; color: var(--accent); }
+  .phase-badge {
+    background: var(--accent);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* ── PHASE TABS ── */
+  .phase-tabs {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+  .phase-tabs::-webkit-scrollbar { display: none; }
+  .phase-tab {
+    flex-shrink: 0;
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .phase-tab.active { color: white; border-color: transparent; }
+  .phase-tab[data-phase="volume"].active { background: var(--blue); }
+  .phase-tab[data-phase="intensity"].active { background: var(--accent2); }
+  .phase-tab[data-phase="strength"].active { background: var(--accent); }
+  .phase-tab[data-phase="deload"].active { background: var(--teal); }
+  .phase-tab[data-phase="deload2"].active { background: #8b5cf6; }
+
+  /* ── DAY TABS ── */
+  .day-nav {
+    display: flex;
+    gap: 0;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .day-nav::-webkit-scrollbar { display: none; }
+  .day-btn {
+    flex: 1;
+    min-width: 80px;
+    padding: 12px 8px;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .day-btn.active { color: var(--text); border-bottom-color: var(--accent); }
+  .day-btn .day-label { font-size: 13px; font-weight: 700; display: block; }
+
+  /* ── WEEK SELECTOR ── */
+  .week-bar {
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .week-bar::-webkit-scrollbar { display: none; }
+  .week-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; flex-shrink: 0; }
+  .week-btn {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .week-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+  /* ── CONTENT ── */
+  .content { padding: 12px 12px 80px; }
+
+  .session-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    margin-bottom: 12px;
+    padding: 0 4px;
+  }
+
+  /* ── EXERCISE CARD ── */
+  .ex-card {
+    background: var(--card);
+    border-radius: 14px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: all 0.2s;
+  }
+  .ex-card.done { border-color: var(--green); opacity: 0.7; }
+  .ex-card.done .ex-name { text-decoration: line-through; color: var(--muted); }
+
+  .ex-header {
+    padding: 13px 14px 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+  }
+
+  .ex-check {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+    transition: all 0.2s;
+  }
+  .ex-card.done .ex-check { background: var(--green); border-color: var(--green); }
+  .ex-check svg { display: none; }
+  .ex-card.done .ex-check svg { display: block; }
+
+  .ex-info { flex: 1; min-width: 0; }
+  .ex-name { font-size: 14px; font-weight: 600; line-height: 1.3; margin-bottom: 6px; }
+
+  .ex-pills { display: flex; flex-wrap: wrap; gap: 5px; }
+  .pill {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .pill.weight { background: rgba(230,57,70,0.15); color: var(--accent); border-color: rgba(230,57,70,0.3); }
+  .pill.reps   { background: rgba(74,158,255,0.12); color: var(--blue); border-color: rgba(74,158,255,0.25); }
+  .pill.sets   { background: rgba(244,196,48,0.12); color: var(--gold); border-color: rgba(244,196,48,0.25); }
+  .pill.rest   { background: rgba(126,126,150,0.15); color: var(--muted); }
+  .pill.pct    { background: rgba(46,194,126,0.12); color: var(--green); border-color: rgba(46,194,126,0.25); }
+
+  /* ── NOTES ── */
+  .ex-note {
+    margin: 0 14px 12px;
+    padding: 8px 10px;
+    background: var(--surface);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--muted);
+    border-left: 2px solid var(--gold);
+    line-height: 1.5;
+  }
+
+  /* ── LOG FIELD ── */
+  .ex-log {
+    padding: 0 14px 12px;
+    display: none;
+  }
+  .ex-card.expanded .ex-log { display: block; }
+  .log-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .log-set-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    width: 40px;
+    flex-shrink: 0;
+    text-transform: uppercase;
+  }
+  .log-input {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 10px;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .log-input:focus { border-color: var(--accent); }
+  .log-input::placeholder { color: var(--muted); font-weight: 400; }
+
+  .expand-btn {
+    padding: 0 14px 10px;
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .expand-btn svg { transition: transform 0.2s; }
+  .ex-card.expanded .expand-btn svg { transform: rotate(180deg); }
+
+  /* ── EMPTY ── */
+  .empty-msg {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  /* ── BOTTOM BAR ── */
+  .bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 100;
+  }
+  .progress-wrap { flex: 1; margin-right: 12px; }
+  .progress-text { font-size: 11px; color: var(--muted); margin-bottom: 5px; }
+  .progress-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--green); border-radius: 2px; transition: width 0.4s; }
+  .finish-btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .finish-btn:active { opacity: 0.8; }
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="header-top">
+    <div class="app-title">Der Einzige Wahre Plan</div>
+    <div class="phase-badge" id="phaseBadge">Volume</div>
+  </div>
+  <div class="phase-tabs" id="phaseTabs">
+    <button class="phase-tab active" data-phase="volume" onclick="setPhase('volume')">Volume</button>
+    <button class="phase-tab" data-phase="intensity" onclick="setPhase('intensity')">Intensity</button>
+    <button class="phase-tab" data-phase="strength" onclick="setPhase('strength')">Strength</button>
+    <button class="phase-tab" data-phase="deload" onclick="setPhase('deload')">Deload 1</button>
+    <button class="phase-tab" data-phase="deload2" onclick="setPhase('deload2')">Deload 2</button>
+  </div>
+</div>
+
+<div class="day-nav" id="dayNav"></div>
+<div class="week-bar" id="weekBar"></div>
+<div class="content" id="content"></div>
+
+<div class="bottom-bar">
+  <div class="progress-wrap">
+    <div class="progress-text" id="progressText">0 / 0 Übungen</div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+  <button class="finish-btn" onclick="finishWorkout()">✓ Fertig</button>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// DATA — extracted 1:1 from Excel
+// ─────────────────────────────────────────────
+const PLAN = {
+  volume: {
+    weeks: 4,
+    days: {
+      "Montag": {
+        session: "Secondary Bench & Pull",
+        exercises: [
+          { name: "Tempo Bench Top Set",        rm: 110, repRM: 1,
+            weeks: [{w:88,r:"1",s:1,rest:"3:00",pct:"80%"},{w:89.5,r:"1",s:1,rest:"3:00",pct:"81%"},{w:91,r:"1",s:1,rest:"3:00",pct:"83%"},{w:82.5,r:"1",s:1,rest:"3:00",pct:"75%"}] },
+          { name: "Tempo Bench Back Down Set",  rm: 85, repRM: 7,
+            weeks: [{w:63.8,r:"7-9",s:3,rest:"2:15",pct:"75%"},{w:59.5,r:"7-9",s:3,rest:"2:15",pct:"70%"},{w:68,r:"7-9",s:3,rest:"2:15",pct:"80%"},{w:72.3,r:"7-9",s:3,rest:"2:15",pct:"85%"}] },
+          { name: "PL Row",                     rm: 70, repRM: 12,
+            weeks: [{w:52.5,r:"12-15",s:2,rest:"2:15",pct:"75%"},{w:56,r:"12-15",s:2,rest:"2:15",pct:"80%"},{w:59.5,r:"12-15",s:2,rest:"2:15",pct:"85%"},{w:63,r:"12-15",s:2,rest:"2:15",pct:"90%"}] },
+          { name: "Incline DB Press",           rm: 32, repRM: 12,
+            weeks: [{w:24,r:"12-15",s:"2 (+DS)",rest:"2:15",pct:"75%"},{w:25.6,r:"12-15",s:"2 (+DS)",rest:"2:15",pct:"80%"},{w:27.2,r:"12-15",s:"2 (+DS)",rest:"2:15",pct:"85%"},{w:28.8,r:"12-15",s:"2 (+DS)",rest:"2:15",pct:"90%"}] },
+          { name: "Wide Grip Row",              rm: 62.5, repRM: 12,
+            weeks: [{w:46.9,r:"12-15",s:2,rest:"2:15",pct:"75%"},{w:50,r:"12-15",s:2,rest:"2:15",pct:"80%"},{w:53.1,r:"12-15",s:2,rest:"2:15",pct:"85%"},{w:56.3,r:"12-15",s:2,rest:"2:15",pct:"90%"}] },
+          { name: "Latzug",                     rm: 70, repRM: 14,
+            weeks: [{w:59.5,r:"14-18",s:2,rest:"1:30",pct:"85%"},{w:63,r:"14-18",s:2,rest:"1:30",pct:"90%"},{w:66.5,r:"14-18",s:2,rest:"1:30",pct:"95%"},{w:70,r:"14-18",s:2,rest:"1:30",pct:"100%"}] },
+          { name: "Bicep Curl",                 rm: 16, repRM: 16,
+            weeks: [{w:12,r:"16-20",s:"2 (+DS)",rest:"1:30",pct:"75%"},{w:12.8,r:"16-20",s:"2 (+DS)",rest:"1:30",pct:"80%"},{w:13.6,r:"16-20",s:"2 (+DS)",rest:"1:30",pct:"85%"},{w:14.4,r:"16-20",s:"2 (+DS)",rest:"1:30",pct:"90%"}] },
+          { name: "Lateral Raises",             rm: 16, repRM: 16,
+            weeks: [{w:12,r:"16-20",s:4,rest:"—",pct:"75%"},{w:12.8,r:"16-20",s:4,rest:"—",pct:"80%"},{w:13.6,r:"16-20",s:4,rest:"—",pct:"85%"},{w:14.4,r:"16-20",s:4,rest:"—",pct:"90%"}] },
+        ]
+      },
+      "Mittwoch": {
+        session: "SBD",
+        exercises: [
+          { name: "Squat Top Set",              rm: 120, repRM: 1,
+            weeks: [{w:102,r:"1-2",s:1,rest:"3:00",pct:"85%"},{w:103.6,r:"1-2",s:1,rest:"3:00",pct:"86%"},{w:96,r:"1-2",s:1,rest:"3:00",pct:"80%"},{w:106.9,r:"1-2",s:1,rest:"3:00",pct:"89%"}] },
+          { name: "Squat Back Down Set",        rm: 100, repRM: 7,
+            weeks: [{w:80,r:"7-9",s:2,rest:"2:15",pct:"80%"},{w:75,r:"7-9",s:2,rest:"2:15",pct:"75%"},{w:90,r:"7-9",s:2,rest:"2:15",pct:"90%"},{w:85,r:"7-9",s:2,rest:"2:15",pct:"85%"}] },
+          { name: "Close Grip Bench (Beine gestreckt)", rm: 85, repRM: 7,
+            weeks: [{w:59.5,r:"7-9",s:3,rest:"2:15",pct:"70%"},{w:55.3,r:"7-9",s:3,rest:"2:15",pct:"65%"},{w:68,r:"7-9",s:3,rest:"2:15",pct:"80%"},{w:63.8,r:"7-9",s:3,rest:"2:15",pct:"75%"}] },
+          { name: "Deadlift",                   rm: 140, repRM: 7,
+            weeks: [{w:105,r:"7-9",s:3,rest:"2:15",pct:"75%"},{w:98,r:"7-9",s:3,rest:"2:15",pct:"70%",note:"Last Set → perfect setup; leg drive before putting butt down"},{w:119,r:"7-9",s:3,rest:"2:15",pct:"85%"},{w:112,r:"7-9",s:3,rest:"2:15",pct:"80%"}] },
+          { name: "Weighted Pullups",           rm: 15, repRM: 7,
+            weeks: [{w:12,r:"7-9",s:2,rest:"2:15",pct:"80%"},{w:11.3,r:"7-9",s:2,rest:"2:15",pct:"75%"},{w:13.5,r:"7-9",s:2,rest:"2:15",pct:"90%"},{w:12.8,r:"7-9",s:2,rest:"2:15",pct:"85%"}] },
+          { name: "Calf Raise",                 rm: 110, repRM: 7,
+            weeks: [{w:88,r:"7-9",s:2,rest:"2:15",pct:"80%"},{w:82.5,r:"7-9",s:2,rest:"2:15",pct:"75%"},{w:99,r:"7-9",s:2,rest:"2:15",pct:"90%"},{w:93.5,r:"7-9",s:2,rest:"2:15",pct:"85%"}] },
+        ]
+      },
+      "Freitag": {
+        session: "Primary Bench & Push",
+        exercises: [
+          { name: "Bench Top Set",              rm: 120, repRM: 1,
+            weeks: [{w:102,r:"1-2",s:1,rest:"3:00",pct:"85%"},{w:103.6,r:"1-2",s:1,rest:"3:00",pct:"86%"},{w:96,r:"1-2",s:1,rest:"3:00",pct:"80%"},{w:106.9,r:"1-2",s:1,rest:"3:00",pct:"89%"}] },
+          { name: "Bench Back Down Set",        rm: 95, repRM: 7,
+            weeks: [{w:76,r:"7-9",s:2,rest:"2:15",pct:"80%"},{w:71.3,r:"7-9",s:2,rest:"2:15",pct:"75%"},{w:85.5,r:"7-9",s:2,rest:"2:15",pct:"90%"},{w:80.8,r:"7-9",s:2,rest:"2:15",pct:"85%"}] },
+          { name: "Dumbbell Incline Bench",     rm: 32, repRM: 12,
+            weeks: [{w:24,r:"12-15",s:2,rest:"2:15",pct:"75%"},{w:25.6,r:"12-15",s:2,rest:"2:15",pct:"80%"},{w:27.2,r:"12-15",s:2,rest:"2:15",pct:"85%"},{w:28.8,r:"12-15",s:2,rest:"2:15",pct:"90%"}] },
+          { name: "Lat Pull Down (eng)",        rm: 80, repRM: 12,
+            weeks: [{w:60,r:"12-15",s:"2 (+DS)",rest:"2:15",pct:"75%"},{w:64,r:"12-15",s:"2 (+DS)",rest:"2:15",pct:"80%"},{w:68,r:"12-15",s:"2 (+DS)",rest:"2:15",pct:"85%"},{w:72,r:"12-15",s:"2 (+DS)",rest:"2:15",pct:"90%"}] },
+          { name: "Overhead Press",             rm: 50, repRM: 12,
+            weeks: [{w:37.5,r:"12-15",s:2,rest:"2:15",pct:"75%"},{w:40,r:"12-15",s:2,rest:"2:15",pct:"80%"},{w:42.5,r:"12-15",s:2,rest:"2:15",pct:"85%"},{w:45,r:"12-15",s:2,rest:"2:15",pct:"90%"}] },
+          { name: "Bicep Curl",                 rm: 18, repRM: 14,
+            weeks: [{w:15.3,r:"14-18",s:2,rest:"1:30",pct:"85%"},{w:16.2,r:"14-18",s:2,rest:"1:30",pct:"90%"},{w:17.1,r:"14-18",s:2,rest:"1:30",pct:"95%"},{w:18,r:"14-18",s:2,rest:"1:30",pct:"100%"}] },
+          { name: "Tricep Extension",           rm: 30, repRM: 16,
+            weeks: [{w:22.5,r:"16-20",s:"2 (+DS)",rest:"1:30",pct:"75%"},{w:24,r:"16-20",s:"2 (+DS)",rest:"1:30",pct:"80%"},{w:25.5,r:"16-20",s:"2 (+DS)",rest:"1:30",pct:"85%"},{w:27,r:"16-20",s:"2 (+DS)",rest:"1:30",pct:"90%"}] },
+          { name: "Lateral Raises",             rm: 20, repRM: 8,
+            weeks: [{w:15,r:"7-9",s:3,rest:"—",pct:"75%"},{w:16,r:"7-9",s:3,rest:"—",pct:"80%"},{w:17,r:"7-9",s:3,rest:"—",pct:"85%"},{w:18,r:"7-9",s:3,rest:"—",pct:"90%"}] },
+        ]
+      },
+      "Samstag": {
+        session: "Deadlift & Legs",
+        exercises: [
+          { name: "Deadlift Top Set",           rm: 160, repRM: 1,
+            weeks: [{w:136,r:"1-2",s:1,rest:"3:00",pct:"85%",note:"Deload week 1"},{w:138.2,r:"1-2",s:1,rest:"3:00",pct:"86%"},{w:128,r:"1-2",s:1,rest:"3:00",pct:"80%"},{w:142.5,r:"1-2",s:1,rest:"3:00",pct:"89%"}] },
+          { name: "Deadlift Back Down Set",     rm: 140, repRM: 7,
+            weeks: [{w:112,r:"7-9",s:2,rest:"2:15",pct:"80%"},{w:91,r:"7-9",s:2,rest:"2:15",pct:"65%",note:"Pause"},{w:126,r:"7-9",s:2,rest:"2:15",pct:"90%"},{w:105,r:"7-9",s:2,rest:"2:15",pct:"75%",note:"Pause"}] },
+          { name: "Deficit Deadlift",           rm: 120, repRM: 7,
+            weeks: [{w:78,r:"7-9",s:2,rest:"2:15",pct:"65%"},{w:84,r:"7-9",s:2,rest:"2:15",pct:"70%"},{w:90,r:"7-9",s:2,rest:"2:15",pct:"75%"},{w:96,r:"7-9",s:2,rest:"2:15",pct:"80%"}] },
+          { name: "Beinpresse",                 rm: 200, repRM: 12,
+            weeks: [{w:150,r:"12-15",s:3,rest:"2:15",pct:"75%"},{w:160,r:"12-15",s:3,rest:"2:15",pct:"80%"},{w:170,r:"12-15",s:4,rest:"2:15",pct:"85%"},{w:180,r:"12-15",s:4,rest:"2:15",pct:"90%"}] },
+          { name: "Calf Raise",                 rm: 90, repRM: 14,
+            weeks: [{w:76.5,r:"14-18",s:2,rest:"1:30",pct:"85%"},{w:81,r:"14-18",s:2,rest:"1:30",pct:"90%"},{w:85.5,r:"14-18",s:2,rest:"1:30",pct:"95%"},{w:90,r:"14-18",s:2,rest:"1:30",pct:"100%"}] },
+          { name: "Latzug",                     rm: 100, repRM: 7,
+            weeks: [{w:80,r:"7-9",s:2,rest:"2:15",pct:"80%"},{w:75,r:"7-9",s:2,rest:"2:15",pct:"75%"},{w:90,r:"7-9",s:2,rest:"2:15",pct:"90%"},{w:85,r:"7-9",s:2,rest:"2:15",pct:"85%"}] },
+        ]
+      }
+    }
+  },
+  intensity: {
+    weeks: 4,
+    days: {
+      "Sonntag": {
+        session: "Secondary Bench & Pull",
+        exercises: [
+          { name: "Tempo Bench Top Set",        rm: 110, repRM: 1,
+            weeks: [{w:94,r:"1",s:1,rest:"3:00",pct:"85%"},{w:89.5,r:"1",s:1,rest:"3:00",pct:"81%"},{w:97,r:"1",s:1,rest:"3:00",pct:"88%"},{w:92.5,r:"1",s:1,rest:"3:00",pct:"84%"}] },
+          { name: "Tempo Bench Back Down Set",  rm: 90, repRM: 5,
+            weeks: [{w:63,r:"5-7",s:3,rest:"2:15",pct:"70%"},{w:67.5,r:"5-7",s:3,rest:"2:15",pct:"75%"},{w:72,r:"5-7",s:3,rest:"2:15",pct:"80%"},{w:76.5,r:"5-7",s:3,rest:"2:15",pct:"85%"}] },
+          { name: "PL Row",                     rm: 85, repRM: 8,
+            weeks: [{w:63.8,r:"8-12",s:2,rest:"2:15",pct:"75%"},{w:68,r:"8-12",s:2,rest:"2:15",pct:"80%"},{w:72.3,r:"8-12",s:2,rest:"2:15",pct:"85%"},{w:76.5,r:"8-12",s:2,rest:"2:15",pct:"90%"}] },
+          { name: "Incline DB Press",           rm: 32, repRM: 8,
+            weeks: [{w:24,r:"8-12",s:"2 (+DS)",rest:"2:15",pct:"75%"},{w:25.6,r:"8-12",s:"2 (+DS)",rest:"2:15",pct:"80%"},{w:27.2,r:"8-12",s:"2 (+DS)",rest:"2:15",pct:"85%"},{w:28.8,r:"8-12",s:"2 (+DS)",rest:"2:15",pct:"90%"}] },
+          { name: "Wide Grip Row",              rm: 70, repRM: 8,
+            weeks: [{w:52.5,r:"8-12",s:2,rest:"2:15",pct:"75%"},{w:56,r:"8-12",s:2,rest:"2:15",pct:"80%"},{w:59.5,r:"8-12",s:2,rest:"2:15",pct:"85%"},{w:63,r:"8-12",s:2,rest:"2:15",pct:"90%"}] },
+          { name: "Latzug",                     rm: 85, repRM: 10,
+            weeks: [{w:72.3,r:"10-14",s:3,rest:"1:30",pct:"85%"},{w:76.5,r:"10-14",s:3,rest:"1:30",pct:"90%"},{w:80.8,r:"10-14",s:4,rest:"1:30",pct:"95%"},{w:85,r:"10-14",s:4,rest:"1:30",pct:"100%"}] },
+          { name: "Bicep Curl",                 rm: 18, repRM: 12,
+            weeks: [{w:13.5,r:"12-16",s:2,rest:"1:30",pct:"75%"},{w:14.4,r:"12-16",s:2,rest:"1:30",pct:"80%"},{w:15.3,r:"12-16",s:3,rest:"1:30",pct:"85%"},{w:16.2,r:"12-16",s:3,rest:"1:30",pct:"90%"}] },
+        ]
+      },
+      "Dienstag": {
+        session: "SBD",
+        exercises: [
+          { name: "Squat Top Set",              rm: 120, repRM: 1,
+            weeks: [{w:102,r:"1-2",s:1,rest:"3:00",pct:"85%"},{w:110.2,r:"1-2",s:1,rest:"3:00",pct:"92%"},{w:105.3,r:"1-2",s:1,rest:"3:00",pct:"88%",note:"Depth not good"},{w:113.4,r:"1-2",s:1,rest:"3:00",pct:"95%"}] },
+          { name: "Squat Back Down Set",        rm: 100, repRM: 5,
+            weeks: [{w:80,r:"5-7",s:2,rest:"2:15",pct:"80%"},{w:75,r:"5-7",s:2,rest:"2:15",pct:"75%"},{w:90,r:"5-7",s:2,rest:"2:15",pct:"90%"},{w:85,r:"5-7",s:2,rest:"2:15",pct:"85%"}] },
+          { name: "Larsen Press / Close Grip",  rm: 90, repRM: 5,
+            weeks: [{w:63,r:"5-7",s:4,rest:"2:15",pct:"70%"},{w:58.5,r:"5-7",s:4,rest:"2:15",pct:"65%"},{w:72,r:"5-7",s:4,rest:"2:15",pct:"80%"},{w:67.5,r:"5-7",s:4,rest:"2:15",pct:"75%"}] },
+          { name: "Classic Deadlift",           rm: 140, repRM: 5,
+            weeks: [{w:105,r:"5-7",s:2,rest:"2:15",pct:"75%"},{w:98,r:"5-7",s:2,rest:"2:15",pct:"70%"},{w:119,r:"5-7",s:2,rest:"2:15",pct:"85%"},{w:112,r:"5-7",s:2,rest:"2:15",pct:"80%"}] },
+          { name: "Weighted Pullups",           rm: 15, repRM: 5,
+            weeks: [{w:11.3,r:"5-7",s:3,rest:"2:15",pct:"75%"},{w:10.5,r:"5-7",s:3,rest:"2:15",pct:"70%"},{w:12.8,r:"5-7",s:4,rest:"2:15",pct:"85%"},{w:12,r:"5-7",s:4,rest:"2:15",pct:"80%"}] },
+          { name: "Calf Raise",                 rm: 120, repRM: 5,
+            weeks: [{w:90,r:"5-7",s:3,rest:"2:15",pct:"75%"},{w:84,r:"5-7",s:3,rest:"2:15",pct:"70%"},{w:102,r:"5-7",s:4,rest:"2:15",pct:"85%"},{w:96,r:"5-7",s:4,rest:"2:15",pct:"80%"}] },
+        ]
+      },
+      "Donnerstag": {
+        session: "Primary Bench & Push",
+        exercises: [
+          { name: "Bench Top Set",              rm: 120, repRM: 1,
+            weeks: [{w:102,r:"1-2",s:1,rest:"3:00",pct:"85%"},{w:110.2,r:"1-2",s:1,rest:"3:00",pct:"92%"},{w:105.3,r:"1-2",s:1,rest:"3:00",pct:"88%"},{w:113.4,r:"1-2",s:1,rest:"3:00",pct:"95%"}] },
+          { name: "Bench Back Down Set",        rm: 100, repRM: 5,
+            weeks: [{w:80,r:"5-7",s:2,rest:"2:15",pct:"80%"},{w:75,r:"5-7",s:2,rest:"2:15",pct:"75%"},{w:90,r:"5-7",s:2,rest:"2:15",pct:"90%"},{w:85,r:"5-7",s:2,rest:"2:15",pct:"85%"}] },
+          { name: "Incline DB Press",           rm: 32, repRM: 8,
+            weeks: [{w:24,r:"8-12",s:2,rest:"2:15",pct:"75%"},{w:25.6,r:"8-12",s:2,rest:"2:15",pct:"80%"},{w:27.2,r:"8-12",s:2,rest:"2:15",pct:"85%"},{w:28.8,r:"8-12",s:2,rest:"2:15",pct:"90%"}] },
+          { name: "Lat Pull Down",              rm: 90, repRM: 8,
+            weeks: [{w:67.5,r:"8-12",s:"2 (+DS)",rest:"2:15",pct:"75%"},{w:72,r:"8-12",s:"2 (+DS)",rest:"2:15",pct:"80%"},{w:76.5,r:"8-12",s:"2 (+DS)",rest:"2:15",pct:"85%"},{w:81,r:"8-12",s:"2 (+DS)",rest:"2:15",pct:"90%"}] },
+          { name: "Overhead Press",             rm: 55, repRM: 8,
+            weeks: [{w:41.3,r:"8-12",s:2,rest:"2:15",pct:"75%"},{w:44,r:"8-12",s:2,rest:"2:15",pct:"80%"},{w:46.8,r:"8-12",s:3,rest:"2:15",pct:"85%"},{w:49.5,r:"8-12",s:3,rest:"2:15",pct:"90%"}] },
+          { name: "Bicep Curl",                 rm: 35, repRM: 10,
+            weeks: [{w:29.8,r:"10-14",s:2,rest:"1:30",pct:"85%"},{w:31.5,r:"10-14",s:2,rest:"1:30",pct:"90%"},{w:33.3,r:"10-14",s:2,rest:"1:30",pct:"95%"},{w:35,r:"10-14",s:2,rest:"1:30",pct:"100%"}] },
+          { name: "Tricep Extension",           rm: 17.5, repRM: 12,
+            weeks: [{w:13.1,r:"12-16",s:3,rest:"1:30",pct:"75%"},{w:14,r:"12-16",s:3,rest:"1:30",pct:"80%"},{w:14.9,r:"12-16",s:4,rest:"1:30",pct:"85%"},{w:15.8,r:"12-16",s:4,rest:"1:30",pct:"90%"}] },
+          { name: "Seitheben",                  rm: 20, repRM: 10,
+            weeks: [{w:17,r:"10-14",s:3,rest:"1:30",pct:"85%"},{w:18,r:"10-14",s:3,rest:"1:30",pct:"90%"},{w:19,r:"10-14",s:4,rest:"1:30",pct:"95%"},{w:20,r:"10-14",s:4,rest:"1:30",pct:"100%"}] },
+        ]
+      },
+      "Samstag": {
+        session: "Deadlift & Legs",
+        exercises: [
+          { name: "Deadlift Top Set",           rm: 165, repRM: 1,
+            weeks: [{w:140.3,r:"1-2",s:1,rest:"3:00",pct:"85%"},{w:151.5,r:"1-2",s:1,rest:"3:00",pct:"92%"},{w:144.7,r:"1-2",s:1,rest:"3:00",pct:"88%"},{w:156,r:"1-2",s:1,rest:"3:00",pct:"95%"}] },
+          { name: "Deadlift Back Down Set",     rm: 140, repRM: 5,
+            weeks: [{w:112,r:"5-7",s:2,rest:"2:15",pct:"80%"},{w:91,r:"5-7",s:2,rest:"2:15",pct:"65%",note:"Pause"},{w:126,r:"5-7",s:2,rest:"2:15",pct:"90%"},{w:105,r:"5-7",s:2,rest:"2:15",pct:"75%",note:"Pause"}] },
+          { name: "Deficit Deadlift",           rm: 130, repRM: 5,
+            weeks: [{w:84.5,r:"5-7",s:2,rest:"2:15",pct:"65%"},{w:91,r:"5-7",s:2,rest:"2:15",pct:"70%"},{w:97.5,r:"5-7",s:2,rest:"2:15",pct:"75%"},{w:104,r:"5-7",s:2,rest:"2:15",pct:"80%"}] },
+          { name: "Beinpresse",                 rm: 220, repRM: 8,
+            weeks: [{w:165,r:"8-12",s:3,rest:"2:15",pct:"75%"},{w:176,r:"8-12",s:3,rest:"2:15",pct:"80%"},{w:187,r:"8-12",s:4,rest:"2:15",pct:"85%"},{w:198,r:"8-12",s:4,rest:"2:15",pct:"90%"}] },
+          { name: "Calf Raise",                 rm: 100, repRM: 10,
+            weeks: [{w:75,r:"10-14",s:2,rest:"1:30",pct:"75%"},{w:90,r:"10-14",s:2,rest:"1:30",pct:"90%"},{w:95,r:"10-14",s:2,rest:"1:30",pct:"95%"},{w:100,r:"10-14",s:2,rest:"1:30",pct:"100%"}] },
+          { name: "Latzug",                     rm: 80, repRM: 12,
+            weeks: [{w:60,r:"12-16",s:3,rest:"1:30",pct:"75%"},{w:72,r:"12-16",s:3,rest:"1:30",pct:"90%"},{w:76,r:"12-16",s:4,rest:"1:30",pct:"95%"},{w:80,r:"12-16",s:4,rest:"1:30",pct:"100%"}] },
+        ]
+      }
+    }
+  },
+  strength: {
+    weeks: 5,
+    days: {
+      "Sonntag": {
+        session: "Secondary Bench & Pull",
+        exercises: [
+          { name: "Tempo Bench Top Set",        rm: 150, repRM: 1,
+            weeks: [{w:128.2,r:"1",s:1,rest:"3:00",pct:"85%"},{w:138.4,r:"1",s:1,rest:"3:00",pct:"92%",note:"No tempo"},{w:132.2,r:"1",s:1,rest:"3:00",pct:"88%"},{w:142.4,r:"1",s:1,rest:"3:00",pct:"95%",note:"No tempo"},{w:136.3,r:"1",s:1,rest:"3:00",pct:"91%"}] },
+          { name: "Tempo Bench Back Down Set",  rm: 136, repRM: 3,
+            weeks: [{w:102,r:"3-5",s:5,rest:"2:15",pct:"75%",note:"No tempo"},{w:95.2,r:"3-5",s:5,rest:"2:15",pct:"70%"},{w:108.8,r:"3-5",s:5,rest:"2:15",pct:"80%",note:"No tempo"},{w:95.2,r:"3-5",s:5,rest:"2:15",pct:"70%"},{w:115.6,r:"3-5",s:"2-4",rest:"2:15",pct:"85%",note:"No tempo"}] },
+          { name: "Bent Over Row",              rm: 60, repRM: 5,
+            weeks: [{w:45,r:"5-8",s:2,rest:"3:00",pct:"75%"},{w:48,r:"5-8",s:2,rest:"3:00",pct:"80%"},{w:51,r:"5-8",s:2,rest:"3:00",pct:"85%"},{w:54,r:"5-8",s:2,rest:"3:00",pct:"90%"},{w:45,r:"5-8",s:2,rest:"3:00",pct:"75%"}] },
+          { name: "Wide Grip Row",              rm: 75, repRM: 5,
+            weeks: [{w:56.3,r:"5-8",s:2,rest:"3:00",pct:"75%"},{w:60,r:"5-8",s:2,rest:"3:00",pct:"80%"},{w:63.8,r:"5-8",s:2,rest:"3:00",pct:"85%"},{w:67.5,r:"5-8",s:2,rest:"3:00",pct:"90%"},{w:56.3,r:"5-8",s:2,rest:"3:00",pct:"75%"}] },
+          { name: "Dip",                        rm: 40, repRM: 6,
+            weeks: [{w:34,r:"6-10",s:2,rest:"2:15",pct:"85%"},{w:36,r:"6-10",s:2,rest:"2:15",pct:"90%"},{w:38,r:"6-10",s:2,rest:"2:15",pct:"95%"},{w:40,r:"6-10",s:2,rest:"2:15",pct:"100%"},{w:34,r:"6-10",s:2,rest:"2:15",pct:"85%"}] },
+          { name: "Bicep Curl",                 rm: 38, repRM: 8,
+            weeks: [{w:28.5,r:"8-12",s:2,rest:"2:15",pct:"75%"},{w:30.4,r:"8-12",s:2,rest:"2:15",pct:"80%"},{w:32.3,r:"8-12",s:2,rest:"2:15",pct:"85%"},{w:34.2,r:"8-12",s:2,rest:"2:15",pct:"90%"},{w:28.5,r:"8-12",s:2,rest:"2:15",pct:"75%"}] },
+        ]
+      },
+      "Dienstag": {
+        session: "SBD",
+        exercises: [
+          { name: "Squat Top Set",              rm: 230, repRM: 1,
+            weeks: [{w:220.5,r:"1",s:1,rest:"5:00",pct:"96%"},{w:211.1,r:"1",s:1,rest:"5:00",pct:"92%"},{w:226.8,r:"1",s:1,rest:"5:00",pct:"99%"},{w:217.4,r:"1",s:1,rest:"5:00",pct:"95%"},{w:230,r:"1",s:1,rest:"5:00",pct:"100%"}] },
+          { name: "Squat Back Down Set",        rm: 210, repRM: 3,
+            weeks: [{w:157.5,r:"3-5",s:4,rest:"3:00",pct:"75%"},{w:168,r:"3-5",s:4,rest:"3:00",pct:"80%"},{w:178.5,r:"3-5",s:4,rest:"3:00",pct:"85%"},{w:189,r:"3-5",s:2,rest:"3:00",pct:"90%"},{w:157.5,r:"3-5",s:2,rest:"3:00",pct:"75%"}] },
+          { name: "Larsen Press / Close Grip",  rm: 136, repRM: 3,
+            weeks: [{w:88.4,r:"3-5",s:2,rest:"3:00",pct:"65%"},{w:95.2,r:"3-5",s:2,rest:"3:00",pct:"70%"},{w:102,r:"3-5",s:2,rest:"3:00",pct:"75%"},{w:108.8,r:"3-5",s:2,rest:"3:00",pct:"80%"},{w:88.4,r:"3-5",s:2,rest:"3:00",pct:"65%"}] },
+          { name: "Sumo Deadlift",              rm: 217.5, repRM: 3,
+            weeks: [{w:152.3,r:"3-5",s:2,rest:"3:00",pct:"70%"},{w:163.1,r:"3-5",s:2,rest:"3:00",pct:"75%"},{w:174,r:"3-5",s:2,rest:"3:00",pct:"80%"},{w:184.9,r:"3-5",s:2,rest:"3:00",pct:"85%"},{w:152.3,r:"3-5",s:2,rest:"3:00",pct:"70%"}] },
+        ]
+      },
+      "Donnerstag": {
+        session: "Primary Bench & Push",
+        exercises: [
+          { name: "Bench Top Set",              rm: 150, repRM: 1,
+            weeks: [{w:143.8,r:"1",s:1,rest:"5:00",pct:"96%",note:"Palm/lat engagement"},{w:137.7,r:"1",s:1,rest:"5:00",pct:"92%"},{w:147.9,r:"1",s:1,rest:"5:00",pct:"99%"},{w:141.8,r:"1",s:1,rest:"5:00",pct:"95%"},{w:150,r:"1",s:1,rest:"5:00",pct:"100%"}] },
+          { name: "Bench Back Down Set",        rm: 136, repRM: 3,
+            weeks: [{w:102,r:"3-5",s:4,rest:"3:00",pct:"75%"},{w:108.8,r:"3-5",s:4,rest:"3:00",pct:"80%"},{w:115.6,r:"3-5",s:4,rest:"3:00",pct:"85%"},{w:122.4,r:"3-5",s:2,rest:"3:00",pct:"90%"},{w:102,r:"3-5",s:2,rest:"3:00",pct:"75%"}] },
+          { name: "Dumbbell Bench Press",       rm: 50, repRM: 5,
+            weeks: [{w:37.5,r:"5-8",s:2,rest:"3:00",pct:"75%"},{w:40,r:"5-8",s:2,rest:"3:00",pct:"80%"},{w:42.5,r:"5-8",s:2,rest:"3:00",pct:"85%"},{w:45,r:"5-8",s:2,rest:"3:00",pct:"90%"},{w:37.5,r:"5-8",s:2,rest:"3:00",pct:"75%"}] },
+          { name: "Overhead Press",             rm: 36, repRM: 5,
+            weeks: [{w:27,r:"5-8",s:2,rest:"3:00",pct:"75%"},{w:28.8,r:"5-8",s:2,rest:"3:00",pct:"80%"},{w:30.6,r:"5-8",s:2,rest:"3:00",pct:"85%"},{w:32.4,r:"5-8",s:2,rest:"3:00",pct:"90%"},{w:27,r:"5-8",s:2,rest:"3:00",pct:"75%"}] },
+          { name: "Bicep Curl",                 rm: 40, repRM: 6,
+            weeks: [{w:34,r:"6-10",s:2,rest:"2:15",pct:"85%"},{w:36,r:"6-10",s:2,rest:"2:15",pct:"90%"},{w:38,r:"6-10",s:2,rest:"2:15",pct:"95%"},{w:40,r:"6-10",s:2,rest:"2:15",pct:"100%"},{w:34,r:"6-10",s:2,rest:"2:15",pct:"85%"}] },
+          { name: "Tricep Extension",           rm: 20, repRM: 8,
+            weeks: [{w:15,r:"8-12",s:2,rest:"2:15",pct:"75%"},{w:16,r:"8-12",s:2,rest:"2:15",pct:"80%"},{w:17,r:"8-12",s:2,rest:"2:15",pct:"85%"},{w:18,r:"8-12",s:2,rest:"2:15",pct:"90%"},{w:15,r:"8-12",s:2,rest:"2:15",pct:"75%"}] },
+        ]
+      },
+      "Dienstag (DL)": {
+        session: "Deadlift & Legs",
+        exercises: [
+          { name: "Deadlift Top Set",           rm: 240, repRM: 1,
+            weeks: [{w:230.1,r:"1",s:1,rest:"5:00",pct:"96%",note:"Foot placement: bar on shin, minimal hinge"},{w:220.3,r:"1",s:1,rest:"5:00",pct:"92%"},{w:236.6,r:"1",s:1,rest:"5:00",pct:"99%"},{w:226.8,r:"1",s:1,rest:"5:00",pct:"95%"},{w:240,r:"1",s:1,rest:"5:00",pct:"100%"}] },
+          { name: "Deadlift Back Down Set",     rm: 217.5, repRM: 3,
+            weeks: [{w:141.4,r:"3-5",s:4,rest:"3:00",pct:"65%",note:"Pause"},{w:174,r:"3-5",s:4,rest:"3:00",pct:"80%"},{w:163.1,r:"3-5",s:4,rest:"3:00",pct:"75%",note:"Pause"},{w:195.8,r:"3-5",s:2,rest:"3:00",pct:"90%"},{w:141.4,r:"3-5",s:2,rest:"3:00",pct:"65%",note:"Pause"}] },
+          { name: "Beinpresse",                 rm: 40, repRM: 5,
+            weeks: [{w:30,r:"5-8",s:2,rest:"3:00",pct:"75%"},{w:32,r:"5-8",s:2,rest:"3:00",pct:"80%"},{w:34,r:"5-8",s:2,rest:"3:00",pct:"85%"},{w:36,r:"5-8",s:2,rest:"3:00",pct:"90%"},{w:30,r:"5-8",s:2,rest:"3:00",pct:"75%"}] },
+          { name: "Calf Raise",                 rm: 126, repRM: 6,
+            weeks: [{w:107.1,r:"6-10",s:2,rest:"2:15",pct:"85%"},{w:113.4,r:"6-10",s:2,rest:"2:15",pct:"90%"},{w:119.7,r:"6-10",s:2,rest:"2:15",pct:"95%"},{w:126,r:"6-10",s:2,rest:"2:15",pct:"100%"},{w:107.1,r:"6-10",s:2,rest:"2:15",pct:"85%"}] },
+          { name: "Plank (weighted)",           rm: 30, repRM: 8,
+            weeks: [{w:25.5,r:"8-12",s:2,rest:"3:00",pct:"85%"},{w:27,r:"8-12",s:2,rest:"3:00",pct:"90%"},{w:28.5,r:"8-12",s:2,rest:"3:00",pct:"95%"},{w:30,r:"8-12",s:2,rest:"3:00",pct:"100%"},{w:25.5,r:"8-12",s:2,rest:"3:00",pct:"85%"}] },
+        ]
+      }
+    }
+  },
+  deload: {
+    weeks: 2,
+    days: {
+      "Sonntag": {
+        session: "Secondary Bench & Pull",
+        exercises: [
+          { name: "Tempo Bench Top Set",        rm: 150, repRM: 1, weeks: [{w:112.5,r:"1",s:1,rest:"3:00",pct:"75%"},{w:112.5,r:"1",s:1,rest:"3:00",pct:"75%"}] },
+          { name: "Tempo Bench Back Down Set",  rm: 122.5, repRM: 7, weeks: [{w:79.6,r:"7-9",s:3,rest:"1:30",pct:"65%"},{w:79.6,r:"7-9",s:3,rest:"1:30",pct:"65%"}] },
+          { name: "Bent Over Row",              rm: 50, repRM: 12, weeks: [{w:32.5,r:"12-15",s:2,rest:"1:30",pct:"65%"},{w:32.5,r:"12-15",s:2,rest:"1:30",pct:"65%"}] },
+          { name: "Butterfly",                  rm: 97.5, repRM: 12, weeks: [{w:63.4,r:"12-15",s:2,rest:"1:30",pct:"65%"},{w:63.4,r:"12-15",s:2,rest:"1:30",pct:"65%"}] },
+          { name: "Wide Grip Row",              rm: 62.5, repRM: 12, weeks: [{w:40.6,r:"12-15",s:2,rest:"1:30",pct:"65%"},{w:40.6,r:"12-15",s:2,rest:"1:30",pct:"65%"}] },
+          { name: "Dip",                        rm: 32.5, repRM: 14, weeks: [{w:24.4,r:"14-18",s:2,rest:"0:45",pct:"75%"},{w:24.4,r:"14-18",s:2,rest:"0:45",pct:"75%"}] },
+          { name: "Bicep Curl",                 rm: 31.5, repRM: 16, weeks: [{w:20.5,r:"16-20",s:2,rest:"0:45",pct:"65%"},{w:20.5,r:"16-20",s:2,rest:"0:45",pct:"65%"}] },
+        ]
+      },
+      "Dienstag": {
+        session: "SBD",
+        exercises: [
+          { name: "Pause Squat Top Set",        rm: 230, repRM: 1, weeks: [{w:184,r:"1-3",s:1,rest:"3:00",pct:"80%"},{w:184,r:"1-3",s:1,rest:"3:00",pct:"80%"}] },
+          { name: "Squat Back Down Set",        rm: 185, repRM: 7, weeks: [{w:129.5,r:"7-9",s:2,rest:"1:30",pct:"70%"},{w:129.5,r:"7-9",s:2,rest:"1:30",pct:"70%"}] },
+          { name: "Larsen / Close Grip",        rm: 122.5, repRM: 7, weeks: [{w:73.5,r:"7-9",s:3,rest:"1:30",pct:"60%"},{w:73.5,r:"7-9",s:3,rest:"1:30",pct:"60%"}] },
+          { name: "Sumo Deadlift",              rm: 195, repRM: 7, weeks: [{w:126.8,r:"7-9",s:3,rest:"1:30",pct:"65%"},{w:126.8,r:"7-9",s:3,rest:"1:30",pct:"65%"}] },
+        ]
+      },
+      "Donnerstag": {
+        session: "Primary Bench & Push",
+        exercises: [
+          { name: "Tempo Bench Top Set",        rm: 150, repRM: 1, weeks: [{w:120,r:"1-3",s:1,rest:"3:00",pct:"80%"},{w:120,r:"1-3",s:1,rest:"3:00",pct:"80%"}] },
+          { name: "Bench Back Down Set",        rm: 122.5, repRM: 7, weeks: [{w:85.8,r:"7-9",s:2,rest:"1:30",pct:"70%"},{w:85.8,r:"7-9",s:2,rest:"1:30",pct:"70%"}] },
+          { name: "Dumbbell Bench",             rm: 41.5, repRM: 12, weeks: [{w:27,r:"12-15",s:2,rest:"1:30",pct:"65%"},{w:27,r:"12-15",s:2,rest:"1:30",pct:"65%"}] },
+          { name: "Lat Pull Down",              rm: 72.5, repRM: 12, weeks: [{w:47.1,r:"12-15",s:2,rest:"1:30",pct:"65%"},{w:47.1,r:"12-15",s:2,rest:"1:30",pct:"65%"}] },
+          { name: "Overhead Press",             rm: 30, repRM: 12, weeks: [{w:19.5,r:"12-15",s:2,rest:"1:30",pct:"65%"},{w:19.5,r:"12-15",s:2,rest:"1:30",pct:"65%"}] },
+          { name: "Bicep Curl",                 rm: 35, repRM: 14, weeks: [{w:26.3,r:"14-18",s:2,rest:"0:45",pct:"75%"},{w:26.3,r:"14-18",s:2,rest:"0:45",pct:"75%"}] },
+          { name: "Tricep Extension",           rm: 16.25, repRM: 16, weeks: [{w:10.6,r:"16-20",s:2,rest:"0:45",pct:"65%"},{w:10.6,r:"16-20",s:2,rest:"0:45",pct:"65%"}] },
+        ]
+      },
+      "Samstag": {
+        session: "Deadlift & Legs",
+        exercises: [
+          { name: "Pause Deadlift Top Set",     rm: 240, repRM: 1, weeks: [{w:192,r:"1-3",s:1,rest:"3:00",pct:"80%"},{w:192,r:"1-3",s:1,rest:"3:00",pct:"80%"}] },
+          { name: "Deadlift Back Down Set",     rm: 195, repRM: 7, weeks: [{w:136.5,r:"7-9",s:2,rest:"1:30",pct:"70%"},{w:136.5,r:"7-9",s:2,rest:"1:30",pct:"70%"}] },
+          { name: "Deficit Deadlift",           rm: 195, repRM: 7, weeks: [{w:117,r:"7-9",s:2,rest:"1:30",pct:"60%"},{w:117,r:"7-9",s:2,rest:"1:30",pct:"60%"}] },
+          { name: "Beinpresse",                 rm: 33.5, repRM: 12, weeks: [{w:21.8,r:"12-15",s:2,rest:"1:30",pct:"65%"},{w:21.8,r:"12-15",s:2,rest:"1:30",pct:"65%"}] },
+          { name: "Calf Raise",                 rm: 103, repRM: 14, weeks: [{w:77.3,r:"14-18",s:2,rest:"0:45",pct:"75%"},{w:77.3,r:"14-18",s:2,rest:"0:45",pct:"75%"}] },
+          { name: "Plank",                      rm: 25, repRM: 16, weeks: [{w:18.8,r:"16-20",s:2,rest:"0:45",pct:"75%"},{w:18.8,r:"16-20",s:2,rest:"0:45",pct:"75%"}] },
+        ]
+      }
+    }
+  },
+  deload2: {
+    weeks: 1,
+    days: {
+      "Sonntag": {
+        session: "Secondary Bench & Pull",
+        exercises: [
+          { name: "Tempo Bench Top Set",        rm: 150, repRM: 1, weeks: [{w:120,r:"1",s:1,rest:"3:00",pct:"80%"}] },
+          { name: "Tempo Bench Back Down Set",  rm: 122.5, repRM: 7, weeks: [{w:85.8,r:"3-5",s:5,rest:"2:15",pct:"70%"}] },
+          { name: "Bent Over Row",              rm: 50, repRM: 12, weeks: [{w:37.5,r:"5-8",s:2,rest:"2:15",pct:"75%"}] },
+          { name: "Butterfly",                  rm: 97.5, repRM: 12, weeks: [{w:73.1,r:"5-8",s:2,rest:"2:15",pct:"75%"}] },
+          { name: "Wide Grip Row",              rm: 62.5, repRM: 12, weeks: [{w:46.9,r:"5-8",s:2,rest:"2:15",pct:"75%"}] },
+          { name: "Dip",                        rm: 32.5, repRM: 14, weeks: [{w:27.6,r:"6-10",s:2,rest:"1:30",pct:"85%"}] },
+          { name: "Bicep Curl",                 rm: 31.5, repRM: 16, weeks: [{w:23.6,r:"8-12",s:2,rest:"1:30",pct:"75%"}] },
+        ]
+      },
+      "Dienstag": {
+        session: "SBD",
+        exercises: [
+          { name: "Squat Top Set",              rm: 230, repRM: 1, weeks: [{w:195.5,r:"1-3",s:1,rest:"3:00",pct:"85%"}] },
+          { name: "Pause Squat Back Down Set",  rm: 185, repRM: 7, weeks: [{w:138.8,r:"3-5",s:4,rest:"2:15",pct:"75%"}] },
+          { name: "Tempo Larsen / CG Bench",    rm: 122.5, repRM: 7, weeks: [{w:79.6,r:"3-5",s:2,rest:"2:15",pct:"65%"}] },
+          { name: "Pause Sumo Deadlift",        rm: 195, repRM: 7, weeks: [{w:136.5,r:"3-5",s:2,rest:"2:15",pct:"70%"}] },
+        ]
+      },
+      "Donnerstag": {
+        session: "Primary Bench & Push",
+        exercises: [
+          { name: "Bench Top Set",              rm: 120, repRM: 1, weeks: [{w:102,r:"1-3",s:1,rest:"3:00",pct:"85%"}] },
+          { name: "Tempo Bench Back Down Set",  rm: 122.5, repRM: 7, weeks: [{w:91.9,r:"3-5",s:4,rest:"2:15",pct:"75%"}] },
+          { name: "Dumbbell Bench",             rm: 41.5, repRM: 12, weeks: [{w:31.1,r:"5-8",s:2,rest:"2:15",pct:"75%"}] },
+          { name: "Lat Pull Down",              rm: 72.5, repRM: 12, weeks: [{w:54.4,r:"5-8",s:2,rest:"2:15",pct:"75%"}] },
+          { name: "Overhead Press",             rm: 30, repRM: 12, weeks: [{w:22.5,r:"5-8",s:2,rest:"2:15",pct:"75%"}] },
+          { name: "Bicep Curl",                 rm: 35, repRM: 14, weeks: [{w:29.8,r:"6-10",s:2,rest:"1:30",pct:"85%"}] },
+          { name: "Tricep Extension",           rm: 16.25, repRM: 16, weeks: [{w:12.2,r:"8-12",s:2,rest:"1:30",pct:"75%"}] },
+        ]
+      },
+      "Samstag": {
+        session: "Deadlift & Legs",
+        exercises: [
+          { name: "Deadlift Top Set",           rm: 240, repRM: 1, weeks: [{w:204,r:"1-3",s:1,rest:"3:00",pct:"85%"}] },
+          { name: "Pause Deadlift Back Down",   rm: 195, repRM: 7, weeks: [{w:146.3,r:"3-5",s:4,rest:"2:15",pct:"75%"}] },
+          { name: "Beinpresse",                 rm: 33.5, repRM: 12, weeks: [{w:25.1,r:"5-8",s:2,rest:"2:15",pct:"75%"}] },
+          { name: "Calf Raise",                 rm: 103, repRM: 14, weeks: [{w:87.6,r:"6-10",s:2,rest:"1:30",pct:"85%"}] },
+          { name: "Plank",                      rm: 25, repRM: 14, weeks: [{w:21.3,r:"8-12",s:2,rest:"1:30",pct:"85%"}] },
+        ]
+      }
+    }
+  }
+};
+
+// ─────────────────────────────────────────────
+// STATE + STORAGE
+// ─────────────────────────────────────────────
+const STORAGE_KEY = 'trainingsplanAppState_v1';
+
+function defaultState() {
+  return {
+    currentPhase: 'volume',
+    currentDay: null,
+    currentWeek: 1,
+    doneByContext: {},
+    logsByContext: {}
+  };
+}
+
+function loadAppState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return defaultState();
+    return { ...defaultState(), ...JSON.parse(raw) };
+  } catch (err) {
+    console.warn('Konnte gespeicherten Stand nicht laden:', err);
+    return defaultState();
+  }
+}
+
+let appState = loadAppState();
+let currentPhase = appState.currentPhase || 'volume';
+let currentDay   = appState.currentDay;
+let currentWeek  = appState.currentWeek || 1;
+let doneSet      = new Set();
+let expandedSet  = new Set();
+
+function getDays() { return Object.keys(PLAN[currentPhase].days); }
+function getMaxWeeks() { return PLAN[currentPhase].weeks; }
+function getExercises() {
+  if (!currentDay) return [];
+  return PLAN[currentPhase].days[currentDay].exercises;
+}
+function getSession() {
+  if (!currentDay) return '';
+  return PLAN[currentPhase].days[currentDay].session;
+}
+function getContextKey() {
+  return `${currentPhase}__${currentDay}__week${currentWeek}`;
+}
+function syncDoneSetFromStorage() {
+  const list = appState.doneByContext[getContextKey()] || [];
+  doneSet = new Set(list);
+}
+function getLogsForContext() {
+  const key = getContextKey();
+  if (!appState.logsByContext[key]) appState.logsByContext[key] = {};
+  return appState.logsByContext[key];
+}
+function saveAppState() {
+  appState.currentPhase = currentPhase;
+  appState.currentDay = currentDay;
+  appState.currentWeek = currentWeek;
+  appState.doneByContext[getContextKey()] = Array.from(doneSet).sort((a,b) => a - b);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+}
+function normaliseCurrentSelection() {
+  const days = getDays();
+  if (!days.includes(currentDay)) currentDay = days[0];
+  const maxWeeks = getMaxWeeks();
+  if (currentWeek < 1 || currentWeek > maxWeeks) currentWeek = 1;
+}
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// ─────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────
+function setPhase(p) {
+  currentPhase = p;
+  currentDay = getDays()[0];
+  currentWeek = 1;
+  expandedSet.clear();
+  syncDoneSetFromStorage();
+  saveAppState();
+  document.querySelectorAll('.phase-tab').forEach(t => t.classList.toggle('active', t.dataset.phase === p));
+  document.getElementById('phaseBadge').textContent = p.charAt(0).toUpperCase() + p.slice(1);
+  renderDayNav(); renderWeekBar(); renderContent();
+}
+
+function setDay(d) {
+  currentDay = d;
+  expandedSet.clear();
+  syncDoneSetFromStorage();
+  saveAppState();
+  document.querySelectorAll('.day-btn').forEach(b => b.classList.toggle('active', b.dataset.day === d));
+  renderContent();
+}
+
+function setWeek(w) {
+  currentWeek = w;
+  expandedSet.clear();
+  syncDoneSetFromStorage();
+  saveAppState();
+  document.querySelectorAll('.week-btn').forEach(b => b.classList.toggle('active', +b.dataset.w === w));
+  renderContent();
+}
+
+function renderDayNav() {
+  const days = getDays();
+  const nav = document.getElementById('dayNav');
+  if (!currentDay || !days.includes(currentDay)) currentDay = days[0];
+  nav.innerHTML = days.map(d => `
+    <button class="day-btn ${d === currentDay ? 'active' : ''}" data-day="${d}" onclick="setDay('${d}')">
+      <span class="day-label">${d.split(' ')[0]}</span>
+      <span style="font-size:10px;color:var(--muted)">${d.includes('(') ? d.match(/\(.*\)/)?.[0] : ''}</span>
+    </button>`).join('');
+}
+
+function renderWeekBar() {
+  const max = getMaxWeeks();
+  if (currentWeek > max) currentWeek = 1;
+  const bar = document.getElementById('weekBar');
+  bar.innerHTML = `<span class="week-label">Woche</span>` +
+    Array.from({length: max}, (_,i) => `
+      <button class="week-btn ${currentWeek === i+1 ? 'active' : ''}" data-w="${i+1}" onclick="setWeek(${i+1})">${i+1}</button>
+    `).join('');
+}
+
+function renderContent() {
+  const exs = getExercises();
+  const wi  = currentWeek - 1;
+  const content = document.getElementById('content');
+  const logs = getLogsForContext();
+
+  if (!exs.length) { content.innerHTML = '<div class="empty-msg">Kein Training für diesen Tag</div>'; updateProgress(); return; }
+
+  content.innerHTML = `<div class="session-title">${getSession()}</div>` +
+    exs.map((ex, idx) => {
+      const wData = ex.weeks[wi] || ex.weeks[0];
+      const isDone = doneSet.has(idx);
+      const isExp  = expandedSet.has(idx);
+      const sets = wData.s;
+      const sCount = typeof sets === 'string' && sets.includes('+DS') ? parseInt(sets) : (typeof sets === 'number' ? sets : parseInt(sets));
+      const savedRows = logs[idx] || [];
+      const logRows = Array.from({length: isNaN(sCount) ? 3 : sCount}, (_, si) => {
+        const saved = savedRows[si] || {};
+        const weightValue = saved.weight ?? '';
+        const repsValue = saved.reps ?? '';
+        return `<div class="log-row">
+          <span class="log-set-label">Satz ${si+1}</span>
+          <input class="log-input" type="number" inputmode="decimal" step="0.5" placeholder="${wData.w} kg" value="${escapeHtml(weightValue)}" oninput="saveLog(${idx}, ${si}, 'weight', this.value)">
+          <input class="log-input" type="number" inputmode="numeric" placeholder="${wData.r}" style="max-width:60px" value="${escapeHtml(repsValue)}" oninput="saveLog(${idx}, ${si}, 'reps', this.value)">
+        </div>`;
+      }).join('');
+
+      return `<div class="ex-card ${isDone ? 'done' : ''} ${isExp ? 'expanded' : ''}" id="ex-${idx}">
+        <div class="ex-header" onclick="toggleExpand(${idx})">
+          <div class="ex-check" onclick="toggleDone(event,${idx})">
+            <svg width="12" height="10" viewBox="0 0 12 10" fill="none">
+              <path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="ex-info">
+            <div class="ex-name">${ex.name}</div>
+            <div class="ex-pills">
+              <span class="pill weight">⚖ ${wData.w} kg</span>
+              <span class="pill reps">✕ ${wData.r}</span>
+              <span class="pill sets">× ${wData.s} Sätze</span>
+              <span class="pill rest">⏱ ${wData.rest}</span>
+              <span class="pill pct">${wData.pct}</span>
+            </div>
+          </div>
+        </div>
+        ${wData.note ? `<div class="ex-note">💡 ${wData.note}</div>` : ''}
+        <div class="expand-btn" onclick="toggleExpand(${idx})">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 9l6 6 6-6"/>
+          </svg>
+          Gewicht & Wdhl. loggen
+        </div>
+        <div class="ex-log">${logRows}</div>
+      </div>`;
+    }).join('');
+
+  updateProgress();
+}
+
+function toggleExpand(idx) {
+  if (expandedSet.has(idx)) expandedSet.delete(idx);
+  else expandedSet.add(idx);
+  const card = document.getElementById(`ex-${idx}`);
+  if (card) card.classList.toggle('expanded', expandedSet.has(idx));
+}
+
+function toggleDone(e, idx) {
+  e.stopPropagation();
+  if (doneSet.has(idx)) doneSet.delete(idx);
+  else doneSet.add(idx);
+  const card = document.getElementById(`ex-${idx}`);
+  if (card) {
+    card.classList.toggle('done', doneSet.has(idx));
+    if (doneSet.has(idx)) expandedSet.delete(idx);
+    card.classList.toggle('expanded', expandedSet.has(idx));
+  }
+  saveAppState();
+  updateProgress();
+}
+
+function saveLog(exerciseIdx, setIdx, field, value) {
+  const logs = getLogsForContext();
+  if (!logs[exerciseIdx]) logs[exerciseIdx] = [];
+  if (!logs[exerciseIdx][setIdx]) logs[exerciseIdx][setIdx] = { weight: '', reps: '' };
+  logs[exerciseIdx][setIdx][field] = value;
+  saveAppState();
+}
+
+function updateProgress() {
+  const total = getExercises().length;
+  const done  = doneSet.size;
+  const pct   = total ? (done / total * 100) : 0;
+  document.getElementById('progressText').textContent = `${done} / ${total} Übungen`;
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+function finishWorkout() {
+  const exs = getExercises();
+  const remaining = exs.length - doneSet.size;
+  if (remaining > 0) {
+    if (!confirm(`Noch ${remaining} Übungen offen. Trotzdem abschliessen?`)) return;
+  }
+  exs.forEach((_, i) => doneSet.add(i));
+  document.querySelectorAll('.ex-card').forEach(c => c.classList.add('done'));
+  saveAppState();
+  updateProgress();
+  setTimeout(() => alert('💪 Workout abgeschlossen! Gut gemacht!'), 100);
+}
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+normaliseCurrentSelection();
+syncDoneSetFromStorage();
+saveAppState();
+document.getElementById('phaseBadge').textContent = currentPhase.charAt(0).toUpperCase() + currentPhase.slice(1);
+document.querySelectorAll('.phase-tab').forEach(t => t.classList.toggle('active', t.dataset.phase === currentPhase));
+renderDayNav();
+renderWeekBar();
+renderContent();
+</script>
+</body>
+</html>
